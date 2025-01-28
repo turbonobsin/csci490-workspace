@@ -1,6 +1,7 @@
 var can = document.querySelector("canvas");
 var gl = can.getContext("webgl2", {
-    antialias: true
+    antialias: false,
+    premultipliedAlpha: false
 });
 var vs_src = "#version 300 es\n\nin vec2 a_position;\n\nuniform vec2 u_resolution;\n\nvoid main(){\n    vec2 pos = a_position / u_resolution * 2.0 - 1.0;\n    pos.y = -pos.y;\n    gl_Position = vec4(pos,0,1);\n}\n\n";
 var fs_src = "#version 300 es\n\nprecision highp float; // have to set this in fragment shader\n\nout vec4 outColor;\nuniform vec4 u_color;\n\nvoid main(){\n    // outColor = vec4(1,0,0.5,1);\n    outColor = u_color;\n}\n\n";

@@ -1,6 +1,7 @@
 const can = document.querySelector("canvas");
 const gl = can.getContext("webgl2",{
-    antialias:true
+    antialias:false,
+    premultipliedAlpha:false
 });
 
 type GL = WebGL2RenderingContext;
