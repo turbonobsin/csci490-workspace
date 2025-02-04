@@ -1,0 +1,511 @@
+const can = document.querySelector("canvas");
+can.width = 1920/2;
+can.height = 1080/2;
+// can.width = 4096;
+// can.height = 4096/1.1;
+const gl = can.getContext("webgl2",{
+    antialias:false,
+    premultipliedAlpha:false,
+    // preserveDrawingBuffer:true,
+    // alpha:false,
+} as WebGLContextAttributes);
+
+type GL = WebGL2RenderingContext;
+
+let vs_src = `#version 300 es
+
+in vec2 a_position;
+// out vec2 v_position;
+
+uniform vec2 u_resolution;
+
+void main(){
+    vec2 pos = a_position / u_resolution * 2.0 - 1.0;
+    pos.y = -pos.y;
+    gl_Position = vec4(pos,0,1);
+    gl_PointSize = 1.0;
+
+    // v_position = a_position;
+}
+
+`;
+let fs_src = `#version 300 es
+
+precision highp float; // have to set this in fragment shader
+
+out vec4 outColor;
+uniform vec4 u_color;
+
+in vec2 v_position;
+
+void main(){
+    outColor = u_color;
+    // outColor = vec4(1,0,0.5,1);
+    // if(u_color.a == 0.0){
+    //     outColor = u_color;
+    //     return;
+    // }
+    // outColor = vec4(
+    //     float(int(v_position.x/1.0) % 256)/256.0,
+    //     float(int(v_position.y/1.0) % 256)/256.0,
+    //     float(int(v_position.y - v_position.x) % 256)/256.0,
+    //     1
+    // );
+}
+
+`;
+
+function createShader(gl:GL,type:any,source:string){
+    let shader = gl.createShader(type);
+    gl.shaderSource(shader,source);
+    gl.compileShader(shader);
+
+    if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){
+        throw gl.getShaderInfoLog(shader);
+    }
+
+    return shader;
+}
+
+function createProgram(gl:GL,vertexShader:WebGLShader,fragmentShader:WebGLShader){
+    let program = gl.createProgram();
+    gl.attachShader(program,vertexShader);
+    gl.attachShader(program,fragmentShader);
+    gl.linkProgram(program);
+
+    if(!gl.getProgramParameter(program,gl.LINK_STATUS)){
+        throw gl.getProgramInfoLog(program);
+    }
+
+    return program;
+}
+
+let vertexShader = createShader(gl,gl.VERTEX_SHADER,vs_src);
+let fragmentShader = createShader(gl,gl.FRAGMENT_SHADER,fs_src);
+
+let program = createProgram(gl,vertexShader,fragmentShader);
+
+// 
+
+let aPositionLoc = gl.getAttribLocation(program,"a_position");
+let positionBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,positionBuffer); // this allows bufferData to access this through gl.ARRAY_BUFFER
+
+let uResolutionLoc = gl.getUniformLocation(program,"u_resolution");
+let uColorLoc = gl.getUniformLocation(program,"u_color");
+
+// 2d points
+let pos = [
+    10, 20,
+    80, 20,
+    10, 30,
+    10, 30,
+    80, 20,
+    80, 30,
+];
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
+
+// 
+let vao = gl.createVertexArray();
+gl.bindVertexArray(vao); // set this one as the one we are going to configure
+gl.enableVertexAttribArray(aPositionLoc); // specifies that we want to get data out of it and edit it
+gl.vertexAttribPointer(aPositionLoc,2,gl.FLOAT,false,0,0); // this also binds ARRAY_BUFFER to this vao
+
+// 
+gl.viewport(0,0,gl.canvas.width,gl.canvas.height); // need this every time you resize the canvas -- -1 to 1 means 0 to can.width
+
+// 
+// gl.colorMask(true,false,false,true);
+gl.clearColor(1,1,1,0);
+// gl.clearColor(0,0,0,0);
+gl.clear(gl.COLOR_BUFFER_BIT);
+gl.enable(gl.BLEND);
+// gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE);
+// gl.blendFunc(gl.SRC_COLOR,gl.ONE_MINUS_DST_COLOR);
+// gl.blendFunc(gl.SRC_ALPHA,gl.DST_COLOR); // crazy white glow effect
+
+// drawing
+gl.useProgram(program);
+
+gl.bindVertexArray(vao);
+gl.uniform2f(uResolutionLoc,gl.canvas.width,gl.canvas.height);
+
+function randInt(n:number){
+    return Math.floor(Math.random()*n);
+}
+
+let cx = gl.canvas.width/2;
+let cy = gl.canvas.height/2;
+
+function drawRect(x:number,y:number,w:number,h?:number){
+    // let w = randInt(50);
+    // let h = randInt(50);
+    // let x = randInt(gl.canvas.width-w);
+    // let y = randInt(gl.canvas.height-h);
+    if(h == undefined) h = w;
+    
+    let x2 = x+w;
+    let y2 = y+h;
+
+    pos = [
+        x,y,
+        x2,y,
+        x,y2,
+        x,y2,
+        x2,y,
+        x2,y2
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
+    gl.uniform4f(uColorLoc,Math.random(),Math.random(),Math.random(),1);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+}
+function drawCircle(x:number,y:number,fill=false,w:number,h?:number){
+    if(h == undefined) h = w;
+    
+    let sx = 1;
+    let sy = 0.5;
+
+    let brushW = 300; // 1
+
+    let rad = w;
+    let pos = [];
+    for(let i = 0; i < 360; i++){
+        let ang = i / 180 * Math.PI;
+        // let rad2 = w/2;
+        let rad2 = w-1;
+        // let rad2 = 0;
+        rad *= 1.01; // funny
+        rad -= 6;
+        brushW *= 0.993;
+        pos.push(
+            Math.cos(ang)*rad*sx + x,
+            Math.sin(ang)*rad*sy + y
+        );
+        if(fill) pos.push(x,y);
+        else{
+            pos.push(
+                Math.cos(ang)*(rad*sx-brushW) + x,
+                Math.sin(ang)*(rad*sy-brushW) + y
+            );
+        }
+    }
+    pos.push(x+Math.cos(1/6.28)*w*sx,y+Math.sin(1/6.28)*w*sy);
+
+    let n = pos.length / 2;
+    
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
+    // gl.uniform4f(uColorLoc,Math.random(),Math.random(),Math.random(),1);
+    // if(!ctrlKey) gl.uniform4f(uColorLoc,1,0,0.5,1);
+    gl.uniform4f(uColorLoc,1,0,0.5,0.5);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,n);
+}
+function drawLine(x1:number,y1:number,x2:number,y2:number,w:number){
+    let fill = !shiftKey;
+    let brushW = 50; // 1
+    let dx = x2-x1;
+    let dy = y2-y1;
+    let ang0 = Math.atan2(dy,dx);
+    let a1 = ang0+Math.PI/2;
+    let a2 = ang0-Math.PI/2;
+    if(a1 < 0) a1 += Math.PI*2;
+    else if(a1 >= Math.PI*2) a1 -= Math.PI*2;
+    if(a2 < 0) a2 += Math.PI*2;
+    else if(a2 >= Math.PI*2) a2 -= Math.PI*2;
+
+    let inc = Math.PI*2/360;
+
+    // let skip = 20; // 1 is full resolution
+    let skip = 1;
+
+    let pos = [];
+    let ang = a1;
+    let rad = w;
+    // pos.push(x1+Math.cos(1/6.28)*rad,y1+Math.sin(1/6.28)*rad);
+    rad = w;
+    for(let i = 0; i < 180+skip; i += skip){
+        ang += inc*skip;
+        // rad -= 2; // funny
+        pos.push(
+            Math.cos(ang)*rad + x1,
+            Math.sin(ang)*rad + y1
+        );
+        if(fill){
+            // pos.push(x1+dx,y1+dy); // <-- almost
+            pos.push(x1,y1);
+        }
+        else{
+            pos.push(
+                Math.cos(ang)*(rad-brushW) + x1,
+                Math.sin(ang)*(rad-brushW) + y1
+            );
+        }
+    }
+
+    ang = a2;
+    for(let i = 0; i < 180+skip; i += skip){
+        ang += inc*skip;
+        // let rad = w;
+        pos.push(
+            Math.cos(ang)*rad + x2,
+            Math.sin(ang)*rad + y2
+        );
+        if(fill){
+            pos.push(x2,y2);
+        }
+        else{
+            pos.push(
+                Math.cos(ang)*(rad-brushW) + x2,
+                Math.sin(ang)*(rad-brushW) + y2
+            );
+        }
+    }
+
+    pos.push(
+        x1+Math.cos(a1+inc)*rad,
+        y1+Math.sin(a1+inc)*rad
+    );
+    if(fill) pos.push(x1,y1);
+    else{
+        pos.push(
+            x1+Math.cos(a1+inc)*(rad-brushW),
+            y1+Math.sin(a1+inc)*(rad-brushW)
+        );
+    }
+
+    // console.log("len: ",pos.length);
+
+    let n = pos.length / 2;
+    
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
+    // gl.uniform4f(uColorLoc,Math.random(),Math.random(),Math.random(),1);
+    // gl.enable(gl.BLEND);
+    let alpha = 1;
+    if(altKey){
+        gl.disable(gl.BLEND);
+        gl.uniform4f(uColorLoc,1,1,1,0);
+    }
+    else{
+        // if(altKey){
+        //     alpha = 0;
+        //     // gl.disable(gl.BLEND);
+        // }
+        if(ctrlKey) alpha = 0.1;
+        // gl.uniform4f(uColorLoc,1,0,0.5,alpha);
+        gl.uniform4f(uColorLoc,1,0,0,alpha);
+    }
+    // gl.drawArrays(gl.TRIANGLE_STRIP,0,n);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,n);
+    gl.enable(gl.BLEND);
+}
+if(0) for(let i = 0; i < 10; i++){
+    let w = randInt(50);
+    let h = randInt(50);
+    let x = randInt(gl.canvas.width-w);
+    let y = randInt(gl.canvas.height-h);
+    drawRect(x,y,w,h);
+}
+
+let start = performance.now();
+// drawRect(cx,cy,60);
+// drawCircle(cx,cy,true,100);
+// drawCircle(cx,cy,true,1700);
+// console.log("time: ",performance.now()-start);
+
+let mouseDown = [false,false,false];
+let keys = {} as Record<string,boolean>;
+let altKey = false;
+let shiftKey = false;
+let ctrlKey = false;
+document.addEventListener("mousedown",e=>{
+    calcMXMY(e);
+    mouseDown[e.button] = true;
+    draw();
+});
+document.addEventListener("mouseup",e=>{
+    mouseDown[e.button] = false;
+});
+document.addEventListener("keydown",e=>{
+    altKey = e.altKey;
+    shiftKey = e.shiftKey;
+    ctrlKey = e.ctrlKey;
+    keys[e.key.toLowerCase()] = true;
+
+    // if(altKey) gl.blendFuncSeparate(gl.ZERO,gl.ONE_MINUS_SRC_ALPHA,gl.ZERO,gl.ZERO);
+    // if(altKey) gl.disable(gl.BLEND);
+});
+document.addEventListener("keyup",e=>{
+    altKey = e.altKey;
+    shiftKey = e.shiftKey;
+    ctrlKey = e.ctrlKey;
+    keys[e.key.toLowerCase()] = false;
+
+    if(e.key.toLowerCase() == "alt"){
+        // gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE);
+        // gl.enable(gl.BLEND);
+    }
+});
+
+let mx = cx;
+let my = cy;
+let lmx = mx;
+let lmy = my;
+function calcMXMY(e:MouseEvent){
+    lmx = mx;
+    lmy = my;
+    mx = (e.clientX-can.offsetLeft)/can.offsetWidth*gl.canvas.width;
+    my = (e.clientY-can.offsetTop)/can.offsetHeight*gl.canvas.height;
+}
+document.addEventListener("mousemove",e=>{
+    calcMXMY(e);
+
+    if(mouseDown[0]){
+        draw();
+    }
+});
+
+function draw(){
+    // drawCircle(Math.floor(mx),Math.floor(my),true,300);
+    // let start = performance.now();
+    // console.log("TIME: ",performance.now()-start);
+    // drawLine(Math.floor(lmx),Math.floor(lmy),Math.floor(mx),Math.floor(my),900);
+    drawLine(Math.floor(lmx),Math.floor(lmy),Math.floor(mx),Math.floor(my),10);
+
+    // Set the color to red with 0.5 opacity
+    // gl.color4f(1.0, 0.0, 0.0, 0.5);
+    // drawCircle(Math.floor(mx),Math.floor(my),true,500);
+}
+
+// 
+// drawLine(gl.canvas.width*0.35,gl.canvas.height*0.35,gl.canvas.width*0.65,gl.canvas.height*0.65,50);
+// drawCircle(cx,cy,false,700);
+
+let _lx = 0;
+let _ly = 0;
+let _mx = 0;
+let _my = 0;
+let lastFrameTime = 0;
+let updateTimeReal = 16.667;
+let updateTimeTheory = 16.667;
+function update(){
+    requestAnimationFrame(update);
+
+    // console.log("update time: ",performance.now()-lastFrameTime);
+    updateTimeReal = performance.now()-lastFrameTime;
+    lastFrameTime = performance.now();
+    
+
+    let ang = performance.now()/500;
+    let rad = gl.canvas.width*0.35;
+    let dx = Math.cos(ang)*rad;
+    let dy = Math.sin(ang)*rad;
+    let tx = dx + cx;
+    let ty = dy + cy;
+    let tx2 = -dx + cx;
+    let ty2 = -dy + cy;
+    _lx = _mx;
+    _ly = _my;
+    _mx = tx;
+    _my = ty;
+    // drawLine(_ly,_ly,_mx,_my,100); // funny thing
+    drawLine(_lx,_ly,_mx,_my,900);
+    // drawLine(tx2,ty2,_mx,_my,50);
+    // for(let i = 0; i < 2000; i += 50){
+    //     drawLine(tx2+i,ty2+i,_mx,_my,50);
+    // }
+
+    // console.log("update time (theory): ",performance.now()-lastFrameTime);
+    updateTimeTheory = performance.now()-lastFrameTime;
+}
+if(1){
+    // update();
+
+    setInterval(()=>{
+        let fps = (16.666667/updateTimeReal)*60;
+        let fpsTheory = (16.666667/updateTimeTheory)*60;
+
+        console.log({
+            fps,fpsTheory
+        });
+    },1000);
+}
+
+let can2 = document.createElement("canvas");
+can2.width = can.width;
+can2.height = can.height;
+let ctx2 = can2.getContext("2d");
+ctx2.fillStyle = "red";
+document.body.appendChild(can2);
+
+let mode = 0;
+
+class Obj{
+    constructor(x=0,y=0,vx=0,vy=0){
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+    }
+    x = 0;
+    y = 0;
+    vx = 0;
+    vy = 0;
+}
+let objs:Obj[] = [];
+function drawParticles(){
+    let pos:number[] = [];
+
+    for(let i = 0; i < objs.length; i++){
+        let o = objs[i];
+        pos.push(o.x,o.y);
+    }
+
+    if(mode == 0){
+        // gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.DYNAMIC_DRAW);
+        gl.uniform4f(uColorLoc,1,0,0,1);
+        gl.drawArrays(gl.POINTS,0,pos.length/2);
+    }
+    else{
+        ctx2.clearRect(0,0,can.width,can.height);
+        for(let i = 0; i < objs.length; i++){
+            let o = objs[i];
+            ctx2.fillRect(Math.floor(o.x),Math.floor(o.y),1,1);
+        }
+    }
+}
+
+function gen2(){
+    for(let i = 0; i < 100000; i++){
+        objs.push(new Obj(
+            Math.random()*gl.canvas.width,
+            Math.random()*gl.canvas.height,Math.random()-0.5,Math.random()-0.5
+        ));
+    }
+}
+gen2();
+
+function update2(){
+    requestAnimationFrame(update2);
+
+    updateTimeReal = performance.now()-lastFrameTime;
+    lastFrameTime = performance.now();
+
+    for(let i = 0; i < objs.length; i++){
+        let o = objs[i];
+        
+        let dx = o.x-cx;
+        let dy = o.y-cy;
+        let dist = Math.sqrt(dx**2+dy**2);
+        o.vx -= dx/dist/10 / dy;
+        o.vy -= dy/dist/10 * dx / 100;
+
+        o.x += o.vx;
+        o.y += o.vy;
+    }
+    
+    drawParticles();
+
+    updateTimeTheory = performance.now()-lastFrameTime;
+}
+update2();
