@@ -6,7 +6,6 @@ can.height = 1080/2;
 const gl = can.getContext("webgl2",{
     antialias:false,
     premultipliedAlpha:false,
-    powerPreference:"high-performance"
     // preserveDrawingBuffer:true,
     // alpha:false,
 } as WebGLContextAttributes);
@@ -495,17 +494,11 @@ function update2(){
     for(let i = 0; i < objs.length; i++){
         let o = objs[i];
         
-        if(keys.w){
-            let dx = o.x-cx;
-            let dy = o.y-cy;
-            let dist = Math.sqrt(dx**2+dy**2);
-            o.vx -= dx/dist/10;
-            o.vy -= dy/dist/10;
-        }
-        if(keys.q){
-            o.vx *= 0.97;
-            o.vy *= 0.97;
-        }
+        let dx = o.x-cx;
+        let dy = o.y-cy;
+        let dist = Math.sqrt(dx**2+dy**2);
+        o.vx -= dx/dist/10 / dy;
+        o.vy -= dy/dist/10 * dx / 100;
 
         o.x += o.vx;
         o.y += o.vy;

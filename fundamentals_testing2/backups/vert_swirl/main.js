@@ -6,7 +6,6 @@ can.height = 1080 / 2;
 var gl = can.getContext("webgl2", {
     antialias: false,
     premultipliedAlpha: false,
-    powerPreference: "high-performance"
     // preserveDrawingBuffer:true,
     // alpha:false,
 });
@@ -381,17 +380,11 @@ function update2() {
     lastFrameTime = performance.now();
     for (var i = 0; i < objs.length; i++) {
         var o = objs[i];
-        if (keys.w) {
-            var dx = o.x - cx;
-            var dy = o.y - cy;
-            var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-            o.vx -= dx / dist / 10;
-            o.vy -= dy / dist / 10;
-        }
-        if (keys.q) {
-            o.vx *= 0.97;
-            o.vy *= 0.97;
-        }
+        var dx = o.x - cx;
+        var dy = o.y - cy;
+        var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+        o.vx -= dx / dist / 10 / dy;
+        o.vy -= dy / dist / 10 * dx / 100;
         o.x += o.vx;
         o.y += o.vy;
     }

@@ -1,6 +1,6 @@
 var can = document.querySelector("canvas");
-can.width = 1920 / 2;
-can.height = 1080 / 2;
+can.width = 1920;
+can.height = 1080;
 // can.width = 4096;
 // can.height = 4096/1.1;
 var gl = can.getContext("webgl2", {
@@ -370,7 +370,7 @@ function drawParticles() {
     }
 }
 function gen2() {
-    for (var i = 0; i < 100000; i++) {
+    for (var i = 0; i < 500000; i++) {
         objs.push(new Obj(Math.random() * gl.canvas.width, Math.random() * gl.canvas.height, Math.random() - 0.5, Math.random() - 0.5));
     }
 }
@@ -381,17 +381,11 @@ function update2() {
     lastFrameTime = performance.now();
     for (var i = 0; i < objs.length; i++) {
         var o = objs[i];
-        if (keys.w) {
-            var dx = o.x - cx;
-            var dy = o.y - cy;
-            var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-            o.vx -= dx / dist / 10;
-            o.vy -= dy / dist / 10;
-        }
-        if (keys.q) {
-            o.vx *= 0.97;
-            o.vy *= 0.97;
-        }
+        // let dx = o.x-cx;
+        // let dy = o.y-cy;
+        // let dist = Math.sqrt(dx**2+dy**2);
+        // o.vx -= dx/dist/10 / dy;
+        // o.vy -= dy/dist/10 * dx / 100;
         o.x += o.vx;
         o.y += o.vy;
     }
