@@ -330,7 +330,7 @@ can2.height = can.height;
 var ctx2 = can2.getContext("2d");
 ctx2.fillStyle = "red";
 document.body.appendChild(can2);
-var mode = 0;
+var mode = 1;
 var Obj = /** @class */ (function () {
     function Obj(x, y, vx, vy) {
         if (x === void 0) { x = 0; }
@@ -374,7 +374,7 @@ function gen2() {
         objs.push(new Obj(Math.random() * gl.canvas.width, Math.random() * gl.canvas.height, Math.random() - 0.5, Math.random() - 0.5));
     }
 }
-// gen2();
+gen2();
 function update2() {
     requestAnimationFrame(update2);
     updateTimeReal = performance.now() - lastFrameTime;

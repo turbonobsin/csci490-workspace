@@ -438,7 +438,7 @@ let ctx2 = can2.getContext("2d");
 ctx2.fillStyle = "red";
 document.body.appendChild(can2);
 
-let mode = 0;
+let mode = 1;
 
 class Obj{
     constructor(x=0,y=0,vx=0,vy=0){
@@ -465,7 +465,7 @@ function drawParticles(){
         // gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
         gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.DYNAMIC_DRAW);
         gl.uniform4f(uColorLoc,1,0,0,1);
-        gl.drawArrays(gl.POINTS,0,pos.length/2);
+        gl.drawArrays(gl.TRIANGLE_FAN,0,pos.length/2);
     }
     else{
         ctx2.clearRect(0,0,can.width,can.height);
@@ -484,7 +484,7 @@ function gen2(){
         ));
     }
 }
-// gen2();
+gen2();
 
 function update2(){
     requestAnimationFrame(update2);
