@@ -50,21 +50,32 @@ let ly = 0;
 let mx = 0;
 let my = 0;
 function calcMouse(/**@type {MouseEvent}*/e){
+    let x = (e.clientX-can.offsetLeft)/can.offsetWidth*can.width;
+    let y = (e.clientY-can.offsetTop)/can.offsetHeight*can.height;
+
+    let dx = x-lx;
+    let dy = y-ly;
+    let dist = Math.sqrt(dx**2+dy**2);
+    
+    if(dist < 20) return;
+    
     lx = mx;
     ly = my;
-    mx = (e.clientX-can.offsetLeft)/can.offsetWidth*can.width;
-    my = (e.clientY-can.offsetTop)/can.offsetHeight*can.height;
+    mx = x;
+    my = y;
+
+    if(mouseDown[0]) drawLine(lx,ly,mx,my);
 }
 function draw(/**@type {MouseEvent}*/e){
     // let r = 5;
     // drawRect(mx-r,my-r,r*2,r*2);
-    drawLine(lx,ly,mx,my);
+    // drawLine(lx,ly,mx,my);
 }
 document.addEventListener("mousemove",e=>{
     calcMouse(e);
 });
 document.addEventListener("mousedown",e=>{
-    calcMouse(e);
+    // calcMouse(e);
 
     mouseDown[e.button] = true;
 });
@@ -149,6 +160,14 @@ function drawLine(x,y,x2,y2){
     gl.uniform2f(uRot,Math.cos(ang),Math.sin(ang));
     gl.uniform2f(uScale,dist,1);
 
+    // let points = [
+    //     x-w/2,y-w,
+    //     x+dist+w/2,y-w,
+    //     x-w/2,y+w,
+    //     x-w/2,y+w,
+    //     x+dist+w/2,y-w,
+    //     x+dist+w/2,y+w
+    // ];
     let points = [
         x,y-w,
         x+dist,y-w,
@@ -163,7 +182,7 @@ function drawLine(x,y,x2,y2){
         points[i+1] = y0;
     }
 
-    points.push(
+    if(0) points.push(
         // x-w,y-w,
         // x+w,y-w,
         // x-w,y+w,

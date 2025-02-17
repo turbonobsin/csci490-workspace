@@ -1,8 +1,16 @@
 var can = document.querySelector("canvas");
 // can.width = 1920/2;
 // can.height = 1080/2;
-can.width = 4096;
-can.height = 4096 / 1.1;
+var scale = 0.01;
+can.width = 4096 * scale;
+can.height = can.width;
+var brushSize = 900 * scale;
+console.log("------", {
+    width: can.width,
+    height: can.height,
+    brushSize: brushSize,
+});
+// can.height = 4096/1.1;
 var gl = can.getContext("webgl2", {
     antialias: false,
     premultipliedAlpha: false,
@@ -131,7 +139,7 @@ function drawCircle(x, y, fill, w, h) {
 }
 function drawLine(x1, y1, x2, y2, w) {
     var fill = !shiftKey;
-    var brushW = 50; // 1
+    var brushW = Math.ceil(50 * scale); // 1
     var dx = x2 - x1;
     var dy = y2 - y1;
     var ang0 = Math.atan2(dy, dx);
@@ -271,7 +279,7 @@ function draw() {
     // drawCircle(Math.floor(mx),Math.floor(my),true,300);
     // let start = performance.now();
     // console.log("TIME: ",performance.now()-start);
-    drawLine(Math.floor(lmx), Math.floor(lmy), Math.floor(mx), Math.floor(my), 900);
+    drawLine(Math.floor(lmx), Math.floor(lmy), Math.floor(mx), Math.floor(my), brushSize);
     // drawLine(Math.floor(lmx),Math.floor(lmy),Math.floor(mx),Math.floor(my),10);
     // Set the color to red with 0.5 opacity
     // gl.color4f(1.0, 0.0, 0.0, 0.5);
@@ -359,7 +367,7 @@ function drawParticles() {
         // gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.STATIC_DRAW);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pos), gl.DYNAMIC_DRAW);
         gl.uniform4f(uColorLoc, 1, 0, 0, 1);
-        gl.drawArrays(gl.POINTS, 0, pos.length / 2);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, pos.length / 2);
     }
     else {
         ctx2.clearRect(0, 0, can.width, can.height);

@@ -83,7 +83,7 @@ gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
 // gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
 
 // uniforms
-let rot = Math.PI/2;
+let rot = 0;
 let s = 1; // 50
 let scale = [80*s,50*s];
 let anchor = [0.5,0.5];
@@ -185,15 +185,18 @@ function render(){
     // gl.uniform2fv(uScale,scale);
     // gl.uniform2fv(uAnchor,anchor);
 
-    if(0){
+    if(1){
         // compute the matrices
-        let transMat = m3.translation(can.width/2,can.height/2);
-        let rotMat = m3.rotation(rot);
-        let scaleMat = m3.scaling(scale[0],scale[1]);
-
-        1
-        let mat = m3.multiply(transMat,rotMat);
-        mat = m3.multiply(mat,scaleMat);
+        let mat = m3.identity();
+        let an = [
+            (anchor[0] - 0.5) * scale[0],
+            -(anchor[1] - 0.5) * scale[1]
+        ];
+        mat = m3.multiply(mat,m3.translation(an[0],an[1]));
+        mat = m3.multiply(mat,m3.translation(can.width/2,can.height/2));
+        mat = m3.multiply(mat,m3.rotation(rot));
+        mat = m3.multiply(mat,m3.translation(-an[0],-an[1]));
+        mat = m3.multiply(mat,m3.scaling(scale[0],scale[1]));
 
         // 2
         // let mat = m3.multiply(scaleMat,rotMat);

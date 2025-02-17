@@ -1,8 +1,18 @@
 const can = document.querySelector("canvas");
 // can.width = 1920/2;
 // can.height = 1080/2;
-can.width = 4096;
-can.height = 4096/1.1;
+let scale = 0.01;
+can.width = 4096 * scale;
+can.height = can.width;
+let brushSize = 900 * scale;
+
+console.log("------",{
+    width:can.width,
+    height:can.height,
+    brushSize,
+});
+
+// can.height = 4096/1.1;
 const gl = can.getContext("webgl2",{
     antialias:false,
     premultipliedAlpha:false,
@@ -203,7 +213,7 @@ function drawCircle(x:number,y:number,fill=false,w:number,h?:number){
 }
 function drawLine(x1:number,y1:number,x2:number,y2:number,w:number){
     let fill = !shiftKey;
-    let brushW = 50; // 1
+    let brushW = Math.ceil(50*scale); // 1
     let dx = x2-x1;
     let dy = y2-y1;
     let ang0 = Math.atan2(dy,dx);
@@ -369,7 +379,7 @@ function draw(){
     // drawCircle(Math.floor(mx),Math.floor(my),true,300);
     // let start = performance.now();
     // console.log("TIME: ",performance.now()-start);
-    drawLine(Math.floor(lmx),Math.floor(lmy),Math.floor(mx),Math.floor(my),900);
+    drawLine(Math.floor(lmx),Math.floor(lmy),Math.floor(mx),Math.floor(my),brushSize);
     // drawLine(Math.floor(lmx),Math.floor(lmy),Math.floor(mx),Math.floor(my),10);
 
     // Set the color to red with 0.5 opacity
