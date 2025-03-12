@@ -133,18 +133,6 @@ const m3 = {
         ];
     },
 
-    translate: function(m, tx, ty) {
-        return m3.multiply(m, m3.translation(tx, ty));
-    },
-     
-    rotate: function(m, angleInRadians) {
-        return m3.multiply(m, m3.rotation(angleInRadians));
-    },
-     
-    scale: function(m, sx, sy) {
-        return m3.multiply(m, m3.scaling(sx, sy));
-    },
-
     multiply: function(a, b) {
         var a00 = a[0 * 3 + 0];
         var a01 = a[0 * 3 + 1];
@@ -185,15 +173,6 @@ const m3 = {
           0, 0, 1,
         ];
     },
-
-    projection: function (width, height) {
-        // Note: This matrix flips the Y axis so that 0 is at the top.
-        return [
-            2 / width, 0, 0,
-            0, -2 / height, 0,
-            -1, 1, 1,
-        ];
-    },
 };
 
 function render(){
@@ -218,27 +197,15 @@ function render(){
             (anchor[0] - 0.5) * scale[0],
             -(anchor[1] - 0.5) * scale[1]
         ];
+        mat = m3.multiply(mat,m3.translation(an[0],an[1]));
+        mat = m3.multiply(mat,m3.translation(can.width/2,can.height/2));
+        mat = m3.multiply(mat,m3.rotation(rot));
+        mat = m3.multiply(mat,m3.translation(-an[0],-an[1]));
+        mat = m3.multiply(mat,m3.scaling(scale[0],scale[1]));
 
-        // MY PIVOT METHOD
-        // mat = m3.multiply(mat,m3.translation(an[0],an[1]));
-        // mat = m3.multiply(mat,m3.translation(can.width/2,can.height/2));
-        // mat = m3.multiply(mat,m3.rotation(rot));
-        // mat = m3.multiply(mat,m3.translation(-an[0],-an[1]));
-        // mat = m3.multiply(mat,m3.scaling(scale[0],scale[1]));
-
-        // THEIR PIVOT METHOD
-        // mat = m3.multiply(mat,m3.projection(can.width,can.height));
-        // mat = m3.multiply(mat,m3.translation(can.width/2,can.height/2));
-        // mat = m3.multiply(mat,m3.rotation(rot));
-        // mat = m3.multiply(mat,m3.scaling(scale[0],scale[1]));
-        // mat = m3.multiply(mat,m3.translation(anchor[0]-0.5,anchor[1]-0.5));
-        // mat = m3.multiply(mat,m3.projection(can.clientWidth,can.clientHeight)); // coordinates are based on screen pixels but you can keep the canvas a lower resolution
-        mat = m3.multiply(mat,m3.projection(can.width,can.height)); // coordinates are in pixel coords
-        mat = m3.translate(mat,can.width/2,can.height/2);
-        mat = m3.rotate(mat,rot);
-        mat = m3.scale(mat,scale[0],scale[1]);
-        mat = m3.translate(mat,anchor[0]-0.5,anchor[1]-0.5);
-        
+        // 2
+        // let mat = m3.multiply(scaleMat,rotMat);
+        // mat = m3.multiply(mat,transMat);
 
         gl.uniformMatrix3fv(uMat,false,mat);
 
