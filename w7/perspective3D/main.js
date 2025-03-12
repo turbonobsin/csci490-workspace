@@ -462,13 +462,22 @@ gl.vertexAttribPointer(aCol,3,gl.UNSIGNED_BYTE,true,0,0);
 
 // uniforms
 let rot = [0,0,0];
-let loc = [can.width/2,can.height/2,0];
+// let loc = [can.width/2,can.height/2,0];
+let loc = [-150,0,-360];
 let scale = [1,1,1];
 let anchor = [0.5,0.5];
+// let fudgeFactor = 1;
+let fov = 60;
 
 window.loc = loc;
 window.rot = rot;
 window.scale = scale;
+// window.setFudge = (v)=>{
+//   fudgeFactor = v;
+// };
+window.setFOV = (v)=>{
+  fov = v;
+};
 
 let uRes = gl.getUniformLocation(program,"u_res");
 let uMat = gl.getUniformLocation(program,"u_mat");
@@ -487,8 +496,8 @@ gl.enable(gl.DEPTH_TEST);
 
 function render(){
     requestAnimationFrame(render);
-    rot[2] += 0.02;
-    rot[1] -= 0.01;
+    // rot[2] += 0.02;
+    // rot[1] -= 0.01;
     
     gl.useProgram(program);
 
@@ -497,20 +506,25 @@ function render(){
 
     gl.bindVertexArray(vao); // optional?
 
+    // set uniforms
     gl.uniform2f(uRes,can.width,can.height);
 
     if(1){
         // compute the mats
+        // let mat = m4.identity();
+        // mat = m4.orthographic(
+        //     0,
+        //     can.width,
+        //     can.height,
+        //     0,
+        //     300,
+        //     -300
+        // );
+
+        // let mat = m4.zToWMat(fudgeFactor);
         let mat = m4.identity();
-        // mat = m4.projection(can.width,can.height,300);
-        mat = m4.orthographic(
-            0,
-            can.width,
-            can.height,
-            0,
-            200,
-            -200
-        );
+        // mat = m4.multiply(mat,m4.projection_simple(can.width,can.height,700));
+        mat = m4.multiply(mat,m4.projection(fov/180*Math.PI,can.width/can.height,1,2000));
         mat = m4.translate(mat,loc[0],loc[1],loc[2]);
         mat = m4.xRotate(mat,rot[0]);
         mat = m4.yRotate(mat,rot[1]);

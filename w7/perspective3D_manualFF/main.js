@@ -465,13 +465,18 @@ let rot = [0,0,0];
 let loc = [can.width/2,can.height/2,0];
 let scale = [1,1,1];
 let anchor = [0.5,0.5];
+let fudgeFactor = 1;
 
 window.loc = loc;
 window.rot = rot;
 window.scale = scale;
+window.setFudge = (v)=>{
+  fudgeFactor = v;
+};
 
 let uRes = gl.getUniformLocation(program,"u_res");
 let uMat = gl.getUniformLocation(program,"u_mat");
+let uFudgeFactor = gl.getUniformLocation(program,"u_fudgeFactor");
 
 window.setAnchor = (a,b)=>{
     anchor[0] = a;
@@ -497,7 +502,9 @@ function render(){
 
     gl.bindVertexArray(vao); // optional?
 
+    // set uniforms
     gl.uniform2f(uRes,can.width,can.height);
+    gl.uniform1f(uFudgeFactor,fudgeFactor);
 
     if(1){
         // compute the mats
@@ -508,8 +515,8 @@ function render(){
             can.width,
             can.height,
             0,
-            200,
-            -200
+            300,
+            -300
         );
         mat = m4.translate(mat,loc[0],loc[1],loc[2]);
         mat = m4.xRotate(mat,rot[0]);
