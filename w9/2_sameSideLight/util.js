@@ -15,7 +15,28 @@ export async function createProgram(gl,name){
     return program;
 }
 
+let MatType = Float32Array;
 export const m4 = {
+/**
+     * Takes a  matrix and a vector with 4 entries, transforms that vector by
+     * the matrix, and returns the result as a vector with 4 entries.
+     * @param {Matrix4} m The matrix.
+     * @param {Vector4} v The point in homogenous coordinates.
+     * @param {Vector4} dst optional vector4 to store result
+     * @return {Vector4} dst or new Vector4 if not provided
+     * @memberOf module:webgl-3d-math
+     */
+    transformVector(m, v, dst) {
+    dst = dst || new MatType(4);
+    for (var i = 0; i < 4; ++i) {
+      dst[i] = 0.0;
+      for (var j = 0; j < 4; ++j) {
+        dst[i] += v[j] * m[j * 4 + i];
+      }
+    }
+    return dst;
+  },
+
     translation: function(tx, ty, tz) {
         return [
             1, 0, 0, 0,

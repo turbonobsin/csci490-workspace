@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/util/basic.css">
+</head>
+<body>
+    <canvas></canvas>
+    <div>
+        <span>Angle</span>
+        <input type="range" id="i-cam-angle" style="width:250px" min="0" max="1" step="0.001">
+    </div>
+    <div>
+        <span>Shininess</span>
+        <input type="range" id="i-shininess" style="width:250px" value="150" min="1" max="300" step="5">
+    </div>
+    <div>
+        <span>Light Color</span>
+        <input type="color" id="i-light-color" value="#ff1010">
+    </div>
+
+    <script type="module" src="util.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

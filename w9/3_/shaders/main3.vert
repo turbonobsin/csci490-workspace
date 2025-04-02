@@ -7,13 +7,15 @@ uniform mat4 u_mat;
 out vec3 v_normal;
 
 uniform mat4 u_worldViewProjection;
-uniform mat4 u_world;
+uniform mat4 u_worldInverseTranspose;
 
 void main(){
     // gl_Position = u_mat * a_pos * vec4(1,-1,1,1); // <-- testing interesting effect
 
-    gl_Position = u_mat * a_pos;
-    // gl_Position = u_worldViewProjection * a_pos;
+    // gl_Position = u_mat * a_pos;
+    gl_Position = u_worldViewProjection * a_pos;
     // v_col = a_col;
-    v_normal = mat3(u_world) * a_normal;
+
+    v_normal = mat3(u_worldInverseTranspose) * a_normal;
+    // v_normal = a_normal;
 }

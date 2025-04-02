@@ -33,140 +33,161 @@ setGeometry(gl);
 // with the values that define a letter 'F'.
 function setGeometry(gl) {
     vertCount = 16*6;
+
+    let pos = [
+        // left column front
+        0,   0,  0,
+        0, 150,  0,
+        30,   0,  0,
+        0, 150,  0,
+        30, 150,  0,
+        30,   0,  0,
+
+        // top rung front
+        30,   0,  0,
+        30,  30,  0,
+        100,   0,  0,
+        30,  30,  0,
+        100,  30,  0,
+        100,   0,  0,
+
+        // middle rung front
+        30,  60,  0,
+        30,  90,  0,
+        67,  60,  0,
+        30,  90,  0,
+        67,  90,  0,
+        67,  60,  0,
+
+        // left column back
+          0,   0,  30,
+         30,   0,  30,
+          0, 150,  30,
+          0, 150,  30,
+         30,   0,  30,
+         30, 150,  30,
+
+        // top rung back
+         30,   0,  30,
+        100,   0,  30,
+         30,  30,  30,
+         30,  30,  30,
+        100,   0,  30,
+        100,  30,  30,
+
+        // middle rung back
+         30,  60,  30,
+         67,  60,  30,
+         30,  90,  30,
+         30,  90,  30,
+         67,  60,  30,
+         67,  90,  30,
+
+        // top
+          0,   0,   0,
+        100,   0,   0,
+        100,   0,  30,
+          0,   0,   0,
+        100,   0,  30,
+          0,   0,  30,
+
+        // top rung right
+        100,   0,   0,
+        100,  30,   0,
+        100,  30,  30,
+        100,   0,   0,
+        100,  30,  30,
+        100,   0,  30,
+
+        // under top rung
+        30,   30,   0,
+        30,   30,  30,
+        100,  30,  30,
+        30,   30,   0,
+        100,  30,  30,
+        100,  30,   0,
+
+        // between top rung and middle
+        30,   30,   0,
+        30,   60,  30,
+        30,   30,  30,
+        30,   30,   0,
+        30,   60,   0,
+        30,   60,  30,
+
+        // top of middle rung
+        30,   60,   0,
+        67,   60,  30,
+        30,   60,  30,
+        30,   60,   0,
+        67,   60,   0,
+        67,   60,  30,
+
+        // right of middle rung
+        67,   60,   0,
+        67,   90,  30,
+        67,   60,  30,
+        67,   60,   0,
+        67,   90,   0,
+        67,   90,  30,
+
+        // bottom of middle rung.
+        30,   90,   0,
+        30,   90,  30,
+        67,   90,  30,
+        30,   90,   0,
+        67,   90,  30,
+        67,   90,   0,
+
+        // right of bottom
+        30,   90,   0,
+        30,  150,  30,
+        30,   90,  30,
+        30,   90,   0,
+        30,  150,   0,
+        30,  150,  30,
+
+        // bottom
+        0,   150,   0,
+        0,   150,  30,
+        30,  150,  30,
+        0,   150,   0,
+        30,  150,  30,
+        30,  150,   0,
+
+        // left side
+        0,   0,   0,
+        0,   0,  30,
+        0, 150,  30,
+        0,   0,   0,
+        0, 150,  30,
+        0, 150,   0,
+    ];
     
-    gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array([
-            // left column front
-            0,   0,  0,
-            0, 150,  0,
-            30,   0,  0,
-            0, 150,  0,
-            30, 150,  0,
-            30,   0,  0,
-  
-            // top rung front
-            30,   0,  0,
-            30,  30,  0,
-            100,   0,  0,
-            30,  30,  0,
-            100,  30,  0,
-            100,   0,  0,
-  
-            // middle rung front
-            30,  60,  0,
-            30,  90,  0,
-            67,  60,  0,
-            30,  90,  0,
-            67,  90,  0,
-            67,  60,  0,
-  
-            // left column back
-              0,   0,  30,
-             30,   0,  30,
-              0, 150,  30,
-              0, 150,  30,
-             30,   0,  30,
-             30, 150,  30,
-  
-            // top rung back
-             30,   0,  30,
-            100,   0,  30,
-             30,  30,  30,
-             30,  30,  30,
-            100,   0,  30,
-            100,  30,  30,
-  
-            // middle rung back
-             30,  60,  30,
-             67,  60,  30,
-             30,  90,  30,
-             30,  90,  30,
-             67,  60,  30,
-             67,  90,  30,
-  
-            // top
-              0,   0,   0,
-            100,   0,   0,
-            100,   0,  30,
-              0,   0,   0,
-            100,   0,  30,
-              0,   0,  30,
-  
-            // top rung right
-            100,   0,   0,
-            100,  30,   0,
-            100,  30,  30,
-            100,   0,   0,
-            100,  30,  30,
-            100,   0,  30,
-  
-            // under top rung
-            30,   30,   0,
-            30,   30,  30,
-            100,  30,  30,
-            30,   30,   0,
-            100,  30,  30,
-            100,  30,   0,
-  
-            // between top rung and middle
-            30,   30,   0,
-            30,   60,  30,
-            30,   30,  30,
-            30,   30,   0,
-            30,   60,   0,
-            30,   60,  30,
-  
-            // top of middle rung
-            30,   60,   0,
-            67,   60,  30,
-            30,   60,  30,
-            30,   60,   0,
-            67,   60,   0,
-            67,   60,  30,
-  
-            // right of middle rung
-            67,   60,   0,
-            67,   90,  30,
-            67,   60,  30,
-            67,   60,   0,
-            67,   90,   0,
-            67,   90,  30,
-  
-            // bottom of middle rung.
-            30,   90,   0,
-            30,   90,  30,
-            67,   90,  30,
-            30,   90,   0,
-            67,   90,  30,
-            67,   90,   0,
-  
-            // right of bottom
-            30,   90,   0,
-            30,  150,  30,
-            30,   90,  30,
-            30,   90,   0,
-            30,  150,   0,
-            30,  150,  30,
-  
-            // bottom
-            0,   150,   0,
-            0,   150,  30,
-            30,  150,  30,
-            0,   150,   0,
-            30,  150,  30,
-            30,  150,   0,
-  
-            // left side
-            0,   0,   0,
-            0,   0,  30,
-            0, 150,  30,
-            0,   0,   0,
-            0, 150,  30,
-            0, 150,   0,
-        ]),
-        gl.STATIC_DRAW);
-  }
+    // gl.bufferData(
+    //     gl.ARRAY_BUFFER,
+    //     new Float32Array(pos),
+    //     gl.STATIC_DRAW);
+
+    // Center the F around the origin and Flip it around. We do this because
+    // we're in 3D now with and +Y is up where as before when we started with 2D
+    // we had +Y as down.
+
+    // We could do by changing all the values above but I'm lazy.
+    // We could also do it with a matrix at draw time but you should
+    // never do stuff at draw time if you can do it at init time.
+    var matrix = m4.xRotation(Math.PI);
+    matrix = m4.translate(matrix, -50, -75, -15);
+
+    for (var ii = 0; ii < pos.length; ii += 3) {
+        var vector = m4.transformVector(matrix, [pos[ii + 0], pos[ii + 1], pos[ii + 2], 1]);
+        pos[ii + 0] = vector[0];
+        pos[ii + 1] = vector[1];
+        pos[ii + 2] = vector[2];
+    }
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pos), gl.STATIC_DRAW);
+}
   
 // Fill the current ARRAY_BUFFER buffer with colors for the 'F'.
 function setColors(gl) {
@@ -613,6 +634,8 @@ let scale = [1,1,1];
 let anchor = [0.5,0.5];
 let fov = 60;
 
+let shininess = 150.0;
+
 window.loc = loc;
 window.rot = rot;
 window.scale = scale;
@@ -623,16 +646,19 @@ window.setFOV = (v)=>{
 let uRes = gl.getUniformLocation(program,"u_res");
 let uMat = gl.getUniformLocation(program,"u_mat");
 let uColorLoc = gl.getUniformLocation(program,"u_color");
-let uReverseLightDirectionLoc = gl.getUniformLocation(program,"u_reverseLightDirection");
 
+// uniform lookup
 let uWorldViewProjectionLoc = gl.getUniformLocation(program,"u_worldViewProjection");
+let uWorldInverseTransposeLoc = gl.getUniformLocation(program,"u_worldInverseTranspose");
+let uLightWorldPosLoc = gl.getUniformLocation(program,"u_lightWorldPosition");
 let uWorldLoc = gl.getUniformLocation(program,"u_world");
+let uViewWorldPosLoc = gl.getUniformLocation(program,"u_viewWorldPosition");
 
-window.setAnchor = (a,b)=>{
-    anchor[0] = a;
-    anchor[1] = b;
-};
+let uShininessLoc = gl.getUniformLocation(program,"u_shininess");
+let uLightColorLoc = gl.getUniformLocation(program,"u_lightColor");
+let uSpecularColorLoc = gl.getUniformLocation(program,"u_specularColor");
 
+// 
 gl.useProgram(program);
 gl.viewport(0,0,can.width,can.height);
 
@@ -648,13 +674,26 @@ function run(){
     drawScene();
 }
 
-let cameraAngle = 0;
+let cameraAngle = Math.PI;
 let cameraRadius = 200;
 let numFs = 5;
+let lightColor = [1,0,0];
 
 let i_camAng = document.querySelector("#i-cam-angle");
+let i_shininess = document.querySelector("#i-shininess");
+let i_lightColor = document.querySelector("#i-light-color");
 i_camAng.addEventListener("input",e=>{
     cameraAngle = i_camAng.value * Math.PI*2;
+});
+i_shininess.addEventListener("input",e=>{
+    shininess = i_shininess.valueAsNumber;
+});
+i_lightColor.addEventListener("input",e=>{
+    let s = i_lightColor.value.substring(1);
+    let r = parseInt(s.substring(0,2),16);
+    let g = parseInt(s.substring(2,4),16);
+    let b = parseInt(s.substring(4,6),16);
+    lightColor = [r,g,b];
 });
 
 function drawScene(){
@@ -678,68 +717,60 @@ function drawScene(){
     // compute the position of the first F
     let fPos = [cameraRadius, 0, 0];
 
-    let cameraMat = m4.yRotation(cameraAngle);
-    cameraMat = m4.translate(cameraMat,0,50,cameraRadius*1.5);
-
-    // get the camera's position from the matrix we computed
-    let camPos = [
-        cameraMat[12],
-        cameraMat[13],
-        cameraMat[14]
-    ];
-
+    // let cameraMat = m4.yRotation(cameraAngle);
+    // cameraMat = m4.translate(cameraMat,0,50,cameraRadius*1.5);
+    let camera = [100,150,200];
+    let target = [0,35,0];
     let up = [0,1,0];
-
-    cameraMat = m4.lookAt(camPos,fPos,up);
+    let cameraMat = m4.lookAt(camera,target,up);
 
     // make a view matrix from the camera matrix
     let viewMatrix = m4.inverse(cameraMat);
 
     // move the projection space to view space (the space in front of the camera)
+    // both applys perspective AND moves the world so that the camera is effectively at the origin
     let viewProjectionMat = m4.multiply(projectionMat,viewMatrix);
 
-    // draw Fs in a circle
-    for(let i = 0; i < numFs; ++i){
-        let ang = i * Math.PI*2 / numFs;
+    // DRAW F
+    let worldMat = m4.yRotation(cameraAngle);
+    let worldViewProjectionMatrix = m4.multiply(viewProjectionMat,worldMat);
+    let worldInverseMat = m4.inverse(worldMat);
+    let worldInverseTransposeMat = m4.transpose(worldInverseMat);
+    gl.uniformMatrix4fv(uWorldViewProjectionLoc,false,worldViewProjectionMatrix);
+    gl.uniformMatrix4fv(uWorldInverseTransposeLoc,false,worldInverseTransposeMat);
 
-        let x = Math.cos(ang) * cameraRadius;
-        let z = Math.sin(ang) * cameraRadius;
+    // let mat = m4.translate(viewProjectionMat,x,-100,z);
+    let mat = m4.yRotate(viewProjectionMat,cameraAngle+Math.PI);
 
-        // add in translation for this F
-        let mat = m4.translate(viewProjectionMat,x,-100,z);
+    gl.uniformMatrix4fv(uMat,false,mat);
 
-        // set the matrix
-        gl.uniformMatrix4fv(uMat,false,mat);
+    // set the color to use
+    gl.uniform4fv(uColorLoc,[0.2,1,0.2,1]); // green
 
-        // let worldMatrix = m4.yRotation(cameraAngle);
-        // let worldViewProjectionMatrix = m4.multiply(viewProjectionMat,worldMatrix);
+    // set the light direction (DIRECTIONAL LIGHT)
+    // gl.uniform3fv(uReverseLightDirectionLoc,normalize([0.5,0.7,1]));
 
-        // gl.uniformMatrix4fv(uWorldViewProjectionLoc,false,worldViewProjectionMatrix);
-        // gl.uniformMatrix2fv(uWorldLoc,false,worldMatrix);
+    gl.uniformMatrix4fv(uWorldLoc,false,worldMat);
+    gl.uniform3fv(uLightWorldPosLoc,[20,30,50]); // POINT LIGHT
 
-        // set the color to use
-        gl.uniform4fv(uColorLoc,[0.2,1,0.2,1]); // green
+    // set the camera/view position
+    gl.uniform3fv(uViewWorldPosLoc,camera); // <-- if you disable this it makes a cool effect
 
-        // set the light direction
-        // gl.uniform3fv(uReverseLightDirectionLoc,normalize([0.5+Math.sin(performance.now()/500)*1,0.7,1]));
-        gl.uniform3fv(uReverseLightDirectionLoc,normalize([-0.5,-0.7,1]));
+    // set shininess
+    gl.uniform1f(uShininessLoc,shininess);
 
-        // draw the geometry
-        gl.drawArrays(gl.TRIANGLES,0,16*6);
-    }
+    // set light color & specular color
+    gl.uniform3fv(uLightColorLoc,normalize(lightColor)); // red light
+    gl.uniform3fv(uSpecularColorLoc,normalize(lightColor)); // red light
+    // gl.uniform3fv(uLightColorLoc,normalize([1,0,0])); // red light
 
-    // OLD CODE for rotating F
+    // original values:
+    // gl.uniform3fv(uLightColorLoc,normalize([1,0.6,0.6])); // red light
+    // gl.uniform3fv(uSpecularColorLoc,normalize([1,0.2,0.2])); // red light
 
-    // mat = m4.translate(mat,loc[0],loc[1],loc[2]);
-    // mat = m4.xRotate(mat,rot[0]);
-    // mat = m4.yRotate(mat,rot[1]);
-    // mat = m4.zRotate(mat,rot[2]);
-    // mat = m4.scale(mat,scale[0],scale[1],scale[2]);
-
-    // gl.uniformMatrix4fv(uMat,false,mat);
-
-    // gl.bindVertexArray(vao);
-    // gl.drawArrays(gl.TRIANGLES,0,vertCount);
+    // FINAL DRAW
+    gl.bindVertexArray(vao);
+    gl.drawArrays(gl.TRIANGLES,0,vertCount);
 }
 
 run();
