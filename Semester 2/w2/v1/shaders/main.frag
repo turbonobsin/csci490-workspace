@@ -1,0 +1,12 @@
+#version 300 es
+
+precision highp float;
+
+out vec4 outColor;
+
+in vec2 v_pos;
+
+void main(){
+    // outColor = vec4(0,0.5,1,1);
+    outColor = vec4(v_pos,0,1);
+}

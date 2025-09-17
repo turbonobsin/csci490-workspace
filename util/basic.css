@@ -6,3 +6,10 @@ canvas{
     /* background:repeating-linear-gradient(0deg, white, gray 10px, red 20px, blue 40px); */
     background-size:100px;
 }
+
+@media (prefers-color-scheme: dark){
+    html{
+        background-color:white;
+        filter:invert(1);
+    }
+}
