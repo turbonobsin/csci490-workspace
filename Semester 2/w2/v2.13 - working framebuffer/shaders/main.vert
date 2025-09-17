@@ -10,7 +10,6 @@ out vec2 v_pos;
 out vec2 v_pos2;
 out vec2 v_pos3;
 out vec2 v_pos4;
-out vec2 v_texCoord;
 
 void main(){
     // vec2 pos = (a_pos + a_vert * float(gl_InstanceID)) / u_res * 2.0 - 1.0;
@@ -23,6 +22,4 @@ void main(){
     v_pos2 = (a_pos + a_vert) / u_res;
     v_pos3 = a_pos;
     v_pos4 = (a_pos + a_vert);
-
-    v_texCoord = a_pos;
 }

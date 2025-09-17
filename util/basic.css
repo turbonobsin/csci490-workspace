@@ -7,9 +7,9 @@ canvas{
     background-size:100px;
 }
 
-@media (prefers-color-scheme: dark){
+/* @media (prefers-color-scheme: dark){
     html{
         background-color:white;
         filter:invert(1);
     }
-}
+} */

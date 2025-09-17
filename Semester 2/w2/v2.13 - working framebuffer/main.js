@@ -4,8 +4,7 @@ const can = document.querySelector("canvas");
 can.width *= scale;
 can.height *= scale;
 const gl = can.getContext("webgl2",{
-    antialias:false,
-    premultipliedAlpha:false
+    antialias:false
 });
 
 async function createShader(type,name){
@@ -41,7 +40,6 @@ let a_vert;
 let a_pos;
 let a_color;
 let u_res;
-let u_tex;
 let vao;
 let vertBuffer;
 let posBuffer;
@@ -51,8 +49,6 @@ let fb1;
 let tex1;
 let fb2;
 let tex2;
-
-let emptyTex;
 
 function createEmptyTexture(){
     let tex = gl.createTexture();
@@ -69,8 +65,6 @@ function createEmptyTexture(){
 async function init(){
     gen();
     // 
-
-    emptyTex = createEmptyTexture();
     
     // image program
     imageProgram = await createProgram("image");
@@ -119,7 +113,6 @@ async function init(){
     a_pos = gl.getAttribLocation(program,"a_pos");
     a_color = gl.getAttribLocation(program,"a_color");
     u_res = gl.getUniformLocation(program,"u_res");
-    u_tex = gl.getUniformLocation(program,"u_tex");
 
     // 
     let circle = [];
@@ -203,11 +196,6 @@ function render(){
     gl.bindBuffer(gl.ARRAY_BUFFER,posBuffer);
     gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(pos),gl.DYNAMIC_DRAW);
 
-    // load empty texture for first pass
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D,emptyTex);
-    gl.uniform1i(u_tex,0);
-
     // 
     // gl.drawArrays(gl.POINTS,0,objs.length);
     // gl.drawArraysInstanced(gl.POINTS,0,objs.length,1);
@@ -217,8 +205,6 @@ function render(){
     // gl.drawArrays(gl.LINE_STRIP,0,64);
     gl.drawArraysInstanced(gl.TRIANGLE_FAN,0,33,objs.length); // solid
     // gl.drawArraysInstanced(gl.LINES,0,33,objs.length); // dashed lines
-
-    // ////////
 
     // draw image
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);
@@ -230,19 +216,6 @@ function render(){
     gl.uniform1i(imageP.u_tex,0);
     
     gl.drawArrays(gl.TRIANGLES,0,6);
-
-    // second pass
-    gl.useProgram(program);
-    gl.bindVertexArray(vao);
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D,tex1); // <-- not sure if this is all necessary
-    gl.uniform1i(u_tex,0);
-
-    gl.drawArraysInstanced(gl.TRIANGLE_FAN,0,33,objs.length);
-
-    // clear tex1
-    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,can.width,can.height,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
 }
 
 init();

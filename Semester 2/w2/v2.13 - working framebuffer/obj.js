@@ -24,8 +24,7 @@ let objs = [];
 function gen(){
     // let amt = 20000; // 1000
     // let amt = 1000;
-    // let amt = 100;
-    let amt = 20;
+    let amt = 100;
     // let amt = 5;
     for(let i = 0; i < amt; i++){
         objs.push(new Obj(
