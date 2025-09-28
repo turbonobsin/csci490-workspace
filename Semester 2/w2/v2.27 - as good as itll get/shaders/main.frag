@@ -68,8 +68,7 @@ void main(){
         // vec2 pos2 = pos;
         vec2 pos2 = pos / u_res;
         pos2.y = 1.0 - pos2.y;
-        // vec4 pixel = texture(u_tex,pos2);
-        vec4 pixel = vec4(0,0,0,0);
+        vec4 pixel = texture(u_tex,pos2);
         vec2 thatPos0 = pixel.ba * 2.0 - 1.0;
         // if(abs(thatPos0.x - v_pos.x) < tol && abs(thatPos0.y - v_pos.y) < tol){
         //     continue;
@@ -82,14 +81,14 @@ void main(){
                 continue;
             }
 
-            // vec2 norm = pixel.rg - 0.5;
-            // vec2 thatPos = thatPos0 * u_res;
+            vec2 norm = pixel.rg - 0.5;
+            vec2 thatPos = thatPos0 * u_res;
             // float d = dot(myNormal0,norm);
             // vec2 tmp = vec2(norm);
             // tmp.y = 0.0;
             // float d = dot(tmp,norm) * 2.0 + 0.5;
             // float d = dot(vec2(1,0),norm) * 2.0 + 0.5;
-            // vec2 ang = normalize((v_pos - thatPos0));
+            vec2 ang = normalize((v_pos - thatPos0));
             // vec2 ang = normalize(vec2(
             //     v_pos.x - thatPos0.x,
             //     v_pos.y - thatPos0.y
@@ -198,8 +197,8 @@ void main(){
     // outColor = vec4(v_pos,0,1);
 
     if(mode == 1){
-        // outColor = vec4(0,0,1,1);
-        // discard;
+        outColor = vec4(0,0,1,1);
+        discard;
         return; // calc only
     }
 

@@ -8,27 +8,6 @@ const gl = can.getContext("webgl2",{
     premultipliedAlpha:false
 });
 
-let mx = 0;
-let my = 0;
-
-let testX = 0;
-let testY = 0;
-
-let keys = {};
-
-document.addEventListener("mousemove",e=>{
-    mx = (e.clientX - can.offsetLeft) / can.offsetWidth * can.width;
-    my = (e.clientY - can.offsetTop) / can.offsetHeight * can.height;
-});
-document.addEventListener("keydown",e=>{
-    let k = e.key.toLowerCase();
-    keys[k] = true;
-});
-document.addEventListener("keyup",e=>{
-    let k = e.key.toLowerCase();
-    keys[k] = false;
-});
-
 async function createShader(type,name){
     let s = gl.createShader(type);
     gl.shaderSource(s,await (await fetch("shaders/"+name)).text());
@@ -63,7 +42,6 @@ let a_pos;
 let a_color;
 let u_res;
 let u_tex;
-let u_mode;
 let vao;
 let vertBuffer;
 let posBuffer;
@@ -142,12 +120,11 @@ async function init(){
     a_color = gl.getAttribLocation(program,"a_color");
     u_res = gl.getUniformLocation(program,"u_res");
     u_tex = gl.getUniformLocation(program,"u_tex");
-    u_mode = gl.getUniformLocation(program,"u_mode");
 
     // 
     let circle = [];
-    // let circleR = 20;
-    let circleR = 4;
+    let circleR = 20;
+    // let circleR = 4;
     for(let i = 0; i <= 6.28; i += 6.28 / 32){
         let tx = Math.cos(i)*circleR;
         let ty = Math.sin(i)*circleR;
@@ -208,38 +185,16 @@ async function init(){
 function render(){
     requestAnimationFrame(render);
 
-    // keys
-    let speed = 2;
-    if(keys.a) testX -= speed;
-    if(keys.d) testX += speed;
-    if(keys.w) testY -= speed;
-    if(keys.s) testY += speed;
-    // 
-
     gl.viewport(0,0,can.width,can.height);
 
     gl.useProgram(program);
     gl.bindVertexArray(vao);
     gl.bindFramebuffer(gl.FRAMEBUFFER,fb1);
 
-    gl.uniform1i(u_mode,0);
-
     let pos = [];
     for(let i = 0; i < objs.length; i++){
         let o = objs[i];
         o.run();
-
-        // DEBUG
-        if(true){
-            if(i == 0){
-                o.x = can.width/2 + testX;
-                o.y = can.height/2 + testY;
-            }
-            else if(i == 1){
-                o.x = mx;
-                o.y = my;
-            }
-        }
 
         pos.push(o.x,o.y);
     }
@@ -267,14 +222,14 @@ function render(){
 
     // draw image
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);
-    // gl.useProgram(imageProgram);
-    // gl.bindVertexArray(imageP.vao);
+    gl.useProgram(imageProgram);
+    gl.bindVertexArray(imageP.vao);
 
-    // gl.activeTexture(gl.TEXTURE0);
-    // gl.bindTexture(gl.TEXTURE_2D,tex1);
-    // gl.uniform1i(imageP.u_tex,0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,tex1);
+    gl.uniform1i(imageP.u_tex,0);
     
-    // gl.drawArrays(gl.TRIANGLES,0,6);
+    gl.drawArrays(gl.TRIANGLES,0,6);
 
     // second pass
     gl.useProgram(program);
@@ -283,8 +238,6 @@ function render(){
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,tex1); // <-- not sure if this is all necessary
     gl.uniform1i(u_tex,0);
-
-    gl.uniform1i(u_mode,1);
 
     gl.drawArraysInstanced(gl.TRIANGLE_FAN,0,33,objs.length);
 

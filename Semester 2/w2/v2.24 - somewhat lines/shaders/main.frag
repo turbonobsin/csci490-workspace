@@ -5,7 +5,6 @@ precision highp float;
 out vec4 outColor;
 uniform vec2 u_res;
 uniform sampler2D u_tex;
-uniform int mode;
 
 in vec4 v_color;
 in vec2 v_pos; // my center
@@ -58,63 +57,40 @@ void main(){
     vec2 norm2 = (v_pos2 - v_pos) * vec2(1,u_res.y/u_res.x);
     // vec2 incAmt = normalize(norm2) / u_res;
     vec2 incAmt = normalize(norm2);
-    float rad = 20.0 * 4.0;
+    float rad = 20.0;
     // vec2 pos = v_pos2;
     vec2 pos = v_pos2 * u_res; // convert to can coords
-    // vec2 pos = v_pos * u_res; // convert to can coords
-    float tol = 3.0; // 0.01
+    float tol = 0.01;
     for(float i = 0.0; i < rad; i += 1.0){
-        pos += incAmt / 2.0;
+        pos += incAmt;
         // vec2 pos2 = pos;
         vec2 pos2 = pos / u_res;
         pos2.y = 1.0 - pos2.y;
-        // vec4 pixel = texture(u_tex,pos2);
-        vec4 pixel = vec4(0,0,0,0);
-        vec2 thatPos0 = pixel.ba * 2.0 - 1.0;
-        // if(abs(thatPos0.x - v_pos.x) < tol && abs(thatPos0.y - v_pos.y) < tol){
-        //     continue;
-        // }
+        vec4 pixel = texture(u_tex,pos2);
+        if(abs(pixel.b - v_pos.x) < tol && abs(pixel.a - v_pos.y) < tol){
+            continue;
+        }
         if(pixel.a != 0.0){
-            if(abs(thatPos0.x - v_pos.x) < 0.01 && abs(thatPos0.y - v_pos.y) < 0.01){
-                continue;
-            }
-            if(abs(pos.x - thatPos0.x * u_res.x) > tol || abs(pos.y - thatPos0.y * u_res.y) > tol){
-                continue;
-            }
-
-            // vec2 norm = pixel.rg - 0.5;
-            // vec2 thatPos = thatPos0 * u_res;
+            vec2 norm = pixel.rg - 0.5;
+            vec2 thatPos0 = pixel.ba - 0.5;
+            vec2 thatPos = (pixel.ba - 0.5) * u_res;
             // float d = dot(myNormal0,norm);
             // vec2 tmp = vec2(norm);
             // tmp.y = 0.0;
             // float d = dot(tmp,norm) * 2.0 + 0.5;
             // float d = dot(vec2(1,0),norm) * 2.0 + 0.5;
-            // vec2 ang = normalize((v_pos - thatPos0));
-            // vec2 ang = normalize(vec2(
-            //     v_pos.x - thatPos0.x,
-            //     v_pos.y - thatPos0.y
-            // ));
+            vec2 ang = normalize((v_pos - thatPos0));
             // vec2 ang = normalize(v_pos) - normalize(thatPos0);
             // float d = dot((vec2(1,0)),incAmt/32.0) * 8.0 + 0.5;
             // float d = dot(incAmt,ang) + 0.5 + 1.0;
             // vec2 incAmt2 = normalize((pos - v_pos) - (v_pos2 - v_pos));
             // float d = dot(ang,incAmt) / 2.0 + 1.0;
             // float d = dot(normalize(myNormal.xy - 0.5),normalize(pixel.xy - 0.5)) / 2.0 + 1.0;
-            // float d = dot(normalize(myNormal.xy - 0.5),-normalize(pixel.xy - 0.5));
-            // float d2 = dot(normalize(myNormal.xy - 0.5),normalize(pixel.xy - 0.5));
-            // d = max(d,d2);
+            float d = dot(normalize(myNormal.xy - 0.5),-normalize(pixel.xy - 0.5));
+            float d2 = dot(normalize(myNormal.xy - 0.5),normalize(pixel.xy - 0.5));
+            d = max(d,d2);
 
-            // float d = dot(normalize(myNormal.xy - 0.5),-ang);
-            // float d = dot(normalize(v_pos2 - v_pos),-vec2(ang.y,ang.x));
-
-            float len = distance(v_pos * u_res,thatPos0 * u_res);
-            if(len > rad/2.0) continue;
-
-            // float dAng1 = atan(myNormal0.y,myNormal0.x);
-            // float dAng0 = atan(thatPos0.y - v_pos.y,thatPos0.x - v_pos.x);
-
-            // d = thatPos0.x - v_pos.x;
-            // d = len + 0.5;
+            float len = distance(v_pos,thatPos0);
 
             // float dAng1 = atan(v_pos2.y - thatPos0.y,v_pos2.x - thatPos0.x);
             // float dAng2 = atan(v_pos2.y - v_pos.y,v_pos2.x - v_pos.x);
@@ -132,16 +108,15 @@ void main(){
             // if(d < 0.51 || d > 1.49){
             //     outColor = vec4(1,0,0,1);
             // }
-            // if(d > 0.9 && abs(len) < 0.8){
+            if(d > 0.9 && abs(len) < 0.8){
                 outColor = vec4(1,0,0,1);
-            // }
-            // else{
-                // outColor = vec4(pixel.ba,0,1);
-                // outColor = vec4(d,d,0,1);
+            }
+            else{
+                outColor = vec4(d,d,0,1);
                 // outColor = vec4(pixel.ba,0,1);
                 // outColor = pixel;
                 // outColor = vec4(ang + 0.5,0,1);
-            // }
+            }
 
 
             // float dAng1 = atan(ang.y,ang.x);
@@ -176,9 +151,9 @@ void main(){
             // outColor = vec4(norm + 0.5,0,1);
 
             // if(d < 0.52){
-            // if(d < 0.01){
+            if(d < 0.01){
                 // outColor = vec4(1,0,0,1);
-            // }
+            }
 
             return;
         }
@@ -196,13 +171,6 @@ void main(){
     // outColor = v_color;
     // outColor = vec4(0,0.5,1,1);
     // outColor = vec4(v_pos,0,1);
-
-    if(mode == 1){
-        // outColor = vec4(0,0,1,1);
-        // discard;
-        return; // calc only
-    }
-
     
     outColor = vec4(
         // gl_Frag
@@ -228,6 +196,6 @@ void main(){
 
         // 0.5,0.5,
         // 1,1
-        v_pos / 2.0 + 0.5
+        v_pos
     );
 }

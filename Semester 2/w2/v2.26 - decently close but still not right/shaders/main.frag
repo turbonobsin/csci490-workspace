@@ -5,7 +5,6 @@ precision highp float;
 out vec4 outColor;
 uniform vec2 u_res;
 uniform sampler2D u_tex;
-uniform int mode;
 
 in vec4 v_color;
 in vec2 v_pos; // my center
@@ -68,8 +67,7 @@ void main(){
         // vec2 pos2 = pos;
         vec2 pos2 = pos / u_res;
         pos2.y = 1.0 - pos2.y;
-        // vec4 pixel = texture(u_tex,pos2);
-        vec4 pixel = vec4(0,0,0,0);
+        vec4 pixel = texture(u_tex,pos2);
         vec2 thatPos0 = pixel.ba * 2.0 - 1.0;
         // if(abs(thatPos0.x - v_pos.x) < tol && abs(thatPos0.y - v_pos.y) < tol){
         //     continue;
@@ -82,14 +80,14 @@ void main(){
                 continue;
             }
 
-            // vec2 norm = pixel.rg - 0.5;
-            // vec2 thatPos = thatPos0 * u_res;
+            vec2 norm = pixel.rg - 0.5;
+            vec2 thatPos = thatPos0 * u_res;
             // float d = dot(myNormal0,norm);
             // vec2 tmp = vec2(norm);
             // tmp.y = 0.0;
             // float d = dot(tmp,norm) * 2.0 + 0.5;
             // float d = dot(vec2(1,0),norm) * 2.0 + 0.5;
-            // vec2 ang = normalize((v_pos - thatPos0));
+            vec2 ang = normalize((v_pos - thatPos0));
             // vec2 ang = normalize(vec2(
             //     v_pos.x - thatPos0.x,
             //     v_pos.y - thatPos0.y
@@ -104,7 +102,7 @@ void main(){
             // float d2 = dot(normalize(myNormal.xy - 0.5),normalize(pixel.xy - 0.5));
             // d = max(d,d2);
 
-            // float d = dot(normalize(myNormal.xy - 0.5),-ang);
+            float d = dot(normalize(myNormal.xy - 0.5),-ang);
             // float d = dot(normalize(v_pos2 - v_pos),-vec2(ang.y,ang.x));
 
             float len = distance(v_pos * u_res,thatPos0 * u_res);
@@ -176,9 +174,9 @@ void main(){
             // outColor = vec4(norm + 0.5,0,1);
 
             // if(d < 0.52){
-            // if(d < 0.01){
+            if(d < 0.01){
                 // outColor = vec4(1,0,0,1);
-            // }
+            }
 
             return;
         }
@@ -196,13 +194,6 @@ void main(){
     // outColor = v_color;
     // outColor = vec4(0,0.5,1,1);
     // outColor = vec4(v_pos,0,1);
-
-    if(mode == 1){
-        // outColor = vec4(0,0,1,1);
-        // discard;
-        return; // calc only
-    }
-
     
     outColor = vec4(
         // gl_Frag

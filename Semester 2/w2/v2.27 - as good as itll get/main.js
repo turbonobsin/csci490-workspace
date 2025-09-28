@@ -146,8 +146,8 @@ async function init(){
 
     // 
     let circle = [];
-    // let circleR = 20;
-    let circleR = 4;
+    let circleR = 20;
+    // let circleR = 4;
     for(let i = 0; i <= 6.28; i += 6.28 / 32){
         let tx = Math.cos(i)*circleR;
         let ty = Math.sin(i)*circleR;
