@@ -62,23 +62,17 @@ async function init(){
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.uniform1i(lineUTex,0);
 
-    let rowW = 1024;
-    // pairs = [];
-    pairs = new Array(rowW*rowW*2).fill(0);
-    let ind = 0;
+    pairs = [];
     for(let i = 0; i < objs.length; i++){
         for(let j = i+1; j < objs.length; j++){
-            // pairs.push(i,j);
-            pairs[ind] = i;
-            pairs[ind+1] = j;
-            ind += 2;
+            pairs.push(i,j);
         }
     }
 
     tex2 = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex2);
     console.log("pair length",pairs.length/2);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32I, rowW, rowW, 0, gl.RG_INTEGER, gl.INT, new Int32Array(pairs));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32I, pairs.length/2, 1, 0, gl.RG_INTEGER, gl.INT, new Int32Array(pairs));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.uniform1i(lineUTex2,1);
@@ -288,7 +282,6 @@ function update(){
         data[i*2 + 1] = o.y;
     }
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32I, objs.length, 1, 0, gl.RG_INTEGER, gl.INT, data);
-    console.log("data",data);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(lineUTex,0);
