@@ -1,0 +1,51 @@
+const can = document.querySelector("canvas");
+const gl = can.getContext("webgl2");
+
+let program;
+let a_pos;
+
+let posBuffer;
+let vao;
+
+async function init(){
+    program = webglUtils.createProgramFromSources(gl,[
+        await (await fetch("shaders/main.vert")).text(),
+        await (await fetch("shaders/main.frag")).text(),
+    ]);
+
+    gl.useProgram(program);
+
+    a_pos = gl.getAttribLocation(program,"a_pos");
+
+    vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    
+    posBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,posBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([
+        -1,-1,
+        1,-1,
+        -1,1,
+        -1,1,
+        1,-1,
+        1,1
+    ]),gl.STATIC_DRAW);
+
+    gl.enableVertexAttribArray(a_pos);
+    gl.vertexAttribPointer(a_pos,2,gl.FLOAT,false,0,0);
+
+    // 
+    draw();
+}
+
+function draw(){
+    gl.viewport(0,0,can.width,can.height);
+    
+    gl.useProgram(program);
+
+    gl.bindVertexArray(vao);
+
+    gl.drawArrays(gl.TRIANGLES,0,6);
+}
+
+init();
